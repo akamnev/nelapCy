@@ -1,12 +1,12 @@
-# spaCy
-spacy/data/
+# nelapCy
+nelapcy/data/
 corpora/
 /models/
 keys/
 
 # Cython / C extensions
 cythonize.json
-spacy/*.html
+nelapcy/*.html
 *.cpp
 *.so
 /include/

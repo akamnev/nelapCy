@@ -28,17 +28,6 @@ cdef class Token:
 
         и т.п. признаки, которые могут быть отнесены к токену.
     """
-    cdef object vocab
-    cdef public str text
-    cdef public str before
-    cdef public str after
-    cdef public str lemma
-    cdef public str tag
-    cdef public str pos
-    cdef public str snt
-
-    cdef str __shape
-    cdef str __short_shape
 
     def __cinit__(self, text, vocab):
         """Construct a `Token` object.

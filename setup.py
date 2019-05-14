@@ -172,7 +172,7 @@ def setup_package():
             if sys.platform == "darwin":
                 dylib_path = [".." for _ in range(mod_name.count("."))]
                 dylib_path = "/".join(dylib_path)
-                dylib_path = "@loader_path/%s/spacy/platform/darwin/lib" % dylib_path
+                dylib_path = "@loader_path/%s/nelapcy/platform/darwin/lib" % dylib_path
                 extra_link_args.append("-Wl,-rpath,%s" % dylib_path)
             ext_modules.append(
                 Extension(
