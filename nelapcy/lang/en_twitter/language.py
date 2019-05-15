@@ -45,7 +45,11 @@ class EnglishTwitter:
         # UNIV PoS and Lemmatizer
         for token in doc:
             token.pos = TAG_MAP[token.tag]
-            token.lemma = self.lemmatizer(token.text, token.pos)[0]
+            # TODO: слова типа #bitcoin/NN -> bitcoin
+            text, tag = token.text, token.tag
+            if text[0] == '#' and tag != 'HT' or text[0] == '$' and tag != 'CT':
+                text = text[1:]
+            token.lemma = self.lemmatizer(text, token.pos)[0]
         return doc
 
     def __call__(self, text, *args, **kwargs):
