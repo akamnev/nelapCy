@@ -3,7 +3,7 @@
 from ...algo.string import Tree
 from ...algo.tokenizer import Tokenizer
 from ...pipeline.crf import Tagger
-from ...pipeline.rules import TaggerRules
+from ...pipeline.rules import TaggerRules, NER
 from ...lemmatizer import Lemmatizer
 from .lemmatizer import LEMMA_RULES, LEMMA_INDEX, LEMMA_EXC, LOOKUP
 from .patterns import TOKEN_MATCH, PUNC_MATCH
@@ -33,6 +33,10 @@ class EnglishTwitter:
         self.tagger_crf = Tagger(tagger_model, token_to_pos_map=token_to_pos_map)
         # Корректор PoS tagger
         self.tagger_rules = TaggerRules()
+        # NER
+        with open(os.path.join(DIR, 'ner', 'lookup.json'), 'r') as fp:
+            lookup = json.load(fp)
+        self.ner = NER(lookup=lookup)
 
     def make_doc(self, text):
         text = replace_html_entities(text)  # TODO: надо бы проверить что делает эта функция
@@ -50,6 +54,9 @@ class EnglishTwitter:
             if text[0] == '#' and tag != 'HT' or text[0] == '$' and tag != 'CT':
                 text = text[1:]
             token.lemma = self.lemmatizer(text, token.pos)[0]
+        # NER
+        self.ner(doc)
+
         return doc
 
     def __call__(self, text, *args, **kwargs):
