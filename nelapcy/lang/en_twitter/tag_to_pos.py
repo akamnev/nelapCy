@@ -47,5 +47,5 @@ TAG_MAP = {
     'WDT': 'ADJ',
     'WP': 'NOUN',
     'WP$': 'ADJ',
-    'WRB': 'ADV,',
+    'WRB': 'ADV',
 }

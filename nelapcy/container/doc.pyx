@@ -36,3 +36,55 @@ cdef class Doc:
     def __iter__(self):
         for t in self.tokens:
             yield t
+
+    def create(self, doc):
+        """
+        Построение объекта типа Doc из списка заданных токенов
+
+        doc - список словарей
+            поля словаря:
+                before,
+                text,
+                after,
+                tag,
+                snt,
+                ne
+        """
+        self.tokens = list()
+        self.__ws = ''
+        for token in doc:
+            if 'before' in token:
+                self.append_ws(token['before'])
+            if 'text' in token:
+                self.append(token['text'])
+            if 'after' in token:
+                self.append_ws(token['after'])
+        for t1, t2 in zip(doc, self):
+            if 'tag' in t1:
+                t2.tag = t1['tag']
+            if 'snt' in t1:
+                t2.snt = t1['snt']
+            if 'ne' in t1:
+                t2.ne = t1['ne']
+        return self
+
+    def named_entities(self, lemmatize=False, sentence=True):
+        """метод возвращает список именнованных сущностей найденных в документе.
+
+        lemmatize -- возвращать леммы именнованных сущностей
+        sentence -- именнованная сущность встречается только в предложении
+        """
+        ne = []
+        for token in self:
+            if token.ne[0] == 'B':
+                ne.append([token])
+            elif token.ne[0] == 'I':
+                ne[-1].append(token)
+        if sentence:
+            ne = [x for x in ne if x[0].snt in ['B_Sentence', 'I_Sentence']]
+        if lemmatize:
+            ne = [{'text': [t.lemma for t in x], 'class': x[0].ne[2:]} for x in ne]
+        else:
+            ne = [{'text': [t.text for t in x], 'class': x[0].ne[2:]} for x in ne]
+        ne = [{'text': ' '.join(x['text']), 'class': x['class']} for x in ne]
+        return ne

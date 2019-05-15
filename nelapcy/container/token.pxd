@@ -7,6 +7,7 @@ cdef class Token:
     cdef public str tag
     cdef public str pos
     cdef public str snt
+    cdef public str ne
 
     cdef str __shape
     cdef str __short_shape
