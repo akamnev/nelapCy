@@ -52,6 +52,10 @@ cdef int score(Span n1, Span n2) except -1:
     """
     if n1.dictionary_word.sym == n2.dictionary_word.sym == CharType.dictionary and \
             n1.dictionary_word.num == n2.dictionary_word.num:
+        if n1.special_word.sym == n2.special_word.sym == CharType.special and \
+            n1.special_word.num != n2.special_word.num:
+                # cant - ca nt or cant
+                return SCORE_MAX + 1
         return 1
     if n1.special_word.sym == n2.special_word.sym == CharType.special and \
             n1.special_word.num == n2.special_word.num:
@@ -85,19 +89,10 @@ cdef int score(Span n1, Span n2) except -1:
 cdef class TokenizerBottomUp:
     """Сегментация текста на основе алгоритма bottom-up"""
 
-    def __init__(self, Tree tree, pattern_special, pattern_punctuation, whitespace_character=None):
+    def __init__(self, Tree tree, pattern_special, pattern_punctuation, whitespace_character):
         self.tree = tree
-        # TODO: перенести в файл со всеми символами
-        if whitespace_character is None:
-            # https://en.wikipedia.org/wiki/Whitespace_character
-            whitespace_character = (
-                '\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003'
-                '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000'
-                # Related whitespace characters without Unicode character property "WSpace=Y"
-                '\u180E\u200B\u200C\u200D\u2060\uFEFF'
-            )
         self.whitespace_character = whitespace_character
-        self.pattern_special = re.compile(pattern_special, re.UNICODE)
+        self.pattern_special = re.compile(pattern_special, re.UNICODE | re.IGNORECASE)
         self.pattern_punctuation = re.compile(pattern_punctuation, re.UNICODE)
 
     cdef list bottom_up_segmentation(self, list ts):
@@ -167,7 +162,7 @@ cdef class TokenizerBottomUp:
                 ts[i].space = Char(CharType.space, 0)
         return ts
 
-    cdef list code_punc(self, str text, list ts):
+    cdef list code_punct(self, str text, list ts):
         cdef int pos = 0
         cdef int tot = len(text)
         cdef i1, i2
@@ -187,7 +182,7 @@ cdef class TokenizerBottomUp:
         ts = self.code_dictionary(text, ts)
         ts = self.code_special(text, ts)
         ts = self.code_space(text, ts)
-        ts = self.code_punc(text, ts)
+        ts = self.code_punct(text, ts)
         return ts
 
 

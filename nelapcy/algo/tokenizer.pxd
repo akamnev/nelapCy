@@ -58,6 +58,6 @@ cdef class TokenizerBottomUp:
     cdef list code_dictionary(self, str text, list ts)
     cdef list code_special(self, str text, list ts)
     cdef list code_space(self, str text, list ts)
-    cdef list code_punc(self, str text, list ts)
+    cdef list code_punct(self, str text, list ts)
     cpdef list process_text(self, str text)
     cpdef run(self, text)

@@ -6,11 +6,12 @@ from ...pipeline.crf import Tagger
 from ...pipeline.rules import TaggerRules, NER
 from ...lemmatizer import Lemmatizer
 from .lemmatizer import LEMMA_RULES, LEMMA_INDEX, LEMMA_EXC, LOOKUP
-from .patterns import TOKEN_MATCH, PUNC_MATCH
+from .patterns import TOKEN_MATCH, PUNCT_MATCH
 from ...misc.html import replace_html_entities
 import json
 import os
 from .tag_to_pos import TAG_MAP
+from ..char_classes import whitespace_character
 
 DIR = os.path.dirname(__file__)
 
@@ -21,9 +22,10 @@ class EnglishTwitter:
     def __init__(self):
         # Токенизатор
         tree = Tree()
-        words = self._read_data('words_dictionary.json')
+        words = self._read_data('tokenizer_dictionary.json')
+        words = [x.lower() for x in words]  # переводим все слова из словаря к нижнему регистру
         tree.create_tree(words)
-        self.tokenizer = Tokenizer(tree, TOKEN_MATCH, PUNC_MATCH)
+        self.tokenizer = Tokenizer(tree, TOKEN_MATCH, PUNCT_MATCH, whitespace_character=whitespace_character)
         # Лемматизатор
         self.lemmatizer = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, LOOKUP)
         # PoS tagger

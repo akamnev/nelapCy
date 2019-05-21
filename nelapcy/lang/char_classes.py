@@ -5,9 +5,6 @@ split_chars = lambda char: list(char.strip().split(" "))
 merge_chars = lambda char: char.strip().replace(" ", "|")
 group_chars = lambda char: char.strip().replace(" ", "")
 
-_bengali = r"\u0980-\u09FF"
-
-_hebrew = r"\u0591-\u05F4\uFB1D-\uFB4F"
 
 # Latin standard
 _latin_u_standard = r"A-Z"
@@ -167,59 +164,40 @@ LATIN = (
     + _latin_diacritics
 )
 
-_persian = (
-    r"\u0620-\u064A\u066E-\u06D5\u06E5-\u06FF\u0750-\u077F\u08A0-\u08BD"
-    r"\uFB50-\uFBB1\uFBD3-\uFD3D\uFD50-\uFDC7\uFDF0-\uFDFB\uFE70-\uFEFC\U0001EE00-\U0001EEBB"
-)
 
-_russian_lower = r"ёа-я"
-_russian_upper = r"ЁА-Я"
-_russian = r"ёа-яЁА-Я"
+_upper = LATIN_UPPER
+_lower = LATIN_LOWER
 
-_sinhala = r"\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6"
+ALPHA = group_chars(LATIN)
+ALPHA_LOWER = group_chars(_lower)
+ALPHA_UPPER = group_chars(_upper)
 
-_tatar_lower = r"әөүҗңһ"
-_tatar_upper = r"ӘӨҮҖҢҺ"
-_tatar = r"әөүҗңһӘӨҮҖҢҺ"
-
-_greek_lower = r"α-ωάέίόώήύ"
-_greek_upper = r"Α-ΩΆΈΊΌΏΉΎ"
-_greek = r"α-ωάέίόώήύΑ-ΩΆΈΊΌΏΉΎ"
-
-_ukrainian_lower = r"а-щюяіїєґ"
-_ukrainian_upper = r"А-ЩЮЯІЇЄҐ"
-_ukrainian = r"а-щюяіїєґА-ЩЮЯІЇЄҐ"
-
-_upper = LATIN_UPPER + _russian_upper + _tatar_upper + _greek_upper + _ukrainian_upper
-_lower = LATIN_LOWER + _russian_lower + _tatar_lower + _greek_lower + _ukrainian_lower
-
-_uncased = _bengali + _hebrew + _persian + _sinhala
-
-ALPHA = group_chars(LATIN + _russian + _tatar + _greek + _ukrainian + _uncased)
-ALPHA_LOWER = group_chars(_lower + _uncased)
-ALPHA_UPPER = group_chars(_upper + _uncased)
-
-_units = (
+units = (
     "km km² km³ m m² m³ dm dm² dm³ cm cm² cm³ mm mm² mm³ ha µm nm yd in ft "
     "kg g mg µg t lb oz m/s km/h kmh mph hPa Pa mbar mb MB kb KB gb GB tb "
-    "TB T G M K % км км² км³ м м² м³ дм дм² дм³ см см² см³ мм мм² мм³ нм "
-    "кг г мг м/с км/ч кПа Па мбар Кб КБ кб Мб МБ мб Гб ГБ гб Тб ТБ тб"
-    "كم كم² كم³ م م² م³ سم سم² سم³ مم مم² مم³ كم غرام جرام جم كغ ملغ كوب اكواب"
+    "TB T G M K % "
 )
-_currency = r"\$ £ € ¥ ฿ US\$ C\$ A\$ ₽ ﷼ ₴"
+currency = r"\$ £ € ¥ ฿ ₽ ₴"
 
-# These expressions contain various unicode variations, including characters
-# used in Chinese (see #1333, #1340, #1351) – unless there are cross-language
-# conflicts, spaCy's base tokenizer should handle all of those by default
-_punct = (
-    r"… …… , : ; \! \? ¿ ؟ ¡ \( \) \[ \] \{ \} < > _ # \* & 。 ？ ！ ， 、 ； ： ～ · । ، ؛ ٪"
+months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec January February March April May June July August ' \
+         'September October November December'
+
+punct = r"… , : ; \! \? ¿ ¡ ？ ！ ， 、 ； ："
+bracket = r'\( \) \[ \] \{ \} < > （ ） 〔 〕 【 】 《 》 〈 〉'
+quotes = r'\' " ” “ ` ‘ ´ ’ ‚ „ » « 「 」 『 』'
+hyphens = r"\- – — ~"
+symbols = r'_ # \* & 。 ～ · । ، ٪ %'
+
+whitespace_character = (
+    '\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003'
+    '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000'
+    # Related whitespace characters without Unicode character property "WSpace=Y"
+    '\u180E\u200B\u200C\u200D\u2060\uFEFF'
 )
-_quotes = r'\' " ” “ ` ‘ ´ ’ ‚ , „ » « 「 」 『 』 （ ） 〔 〕 【 】 《 》 〈 〉'
-_hyphens = "- – — -- --- —— ~"
 
 # Various symbols like dingbats, but also emoji
 # Details: https://www.compart.com/en/unicode/category/So
-_other_symbols = (
+other_symbols = (
     r"\u00A6\u00A9\u00AE\u00B0\u0482\u058D\u058E\u060E\u060F\u06DE\u06E9\u06FD\u06FE\u07F6\u09FA\u0B70"
     r"\u0BF3-\u0BF8\u0BFA\u0C7F\u0D4F\u0D79\u0F01-\u0F03\u0F13\u0F15-\u0F17\u0F1A-\u0F1F\u0F34"
     r"\u0F36\u0F38\u0FBE-\u0FC5\u0FC7-\u0FCC\u0FCE\u0FCF\u0FD5-\u0FD8\u109E\u109F\u1390-\u1399"
@@ -249,19 +227,24 @@ _other_symbols = (
     r"\U0001F9B0-\U0001F9B9\U0001F9C0-\U0001F9C2\U0001F9D0-\U0001F9FF\U0001FA60-\U0001FA6D"
 )
 
-UNITS = merge_chars(_units)
-CURRENCY = merge_chars(_currency)
-PUNCT = merge_chars(_punct)
-HYPHENS = merge_chars(_hyphens)
-ICONS = _other_symbols
+UNITS = merge_chars(units)
+CURRENCY = merge_chars(currency)
+PUNCT = merge_chars(punct)
+HYPHENS = merge_chars(hyphens)
+ICONS = other_symbols
+MONTHS = merge_chars(months)
 
-LIST_UNITS = split_chars(_units)
-LIST_CURRENCY = split_chars(_currency)
-LIST_QUOTES = split_chars(_quotes)
-LIST_PUNCT = split_chars(_punct)
-LIST_HYPHENS = split_chars(_hyphens)
-LIST_ELLIPSES = [r"\.\.+", "…"]
-LIST_ICONS = [r"[{i}]".format(i=_other_symbols)]
 
-CONCAT_QUOTES = group_chars(_quotes)
-CONCAT_ICONS = _other_symbols
+LIST_UNITS = split_chars(units)
+LIST_CURRENCY = split_chars(currency)
+LIST_QUOTES = split_chars(quotes)
+LIST_PUNCT = split_chars(punct)
+LIST_HYPHENS = split_chars(hyphens)
+
+CONCAT_QUOTES = group_chars(quotes)
+CONCAT_ICONS = other_symbols
+CONCAT_BRACKET = group_chars(bracket)
+CONCAT_PUNCT = group_chars(punct)
+CONCAT_HYPHENS = group_chars(hyphens)
+CONCAT_CURRENCY = group_chars(currency)
+CONCAT_SYMBOL = group_chars(symbols)
