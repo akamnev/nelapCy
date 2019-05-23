@@ -9,7 +9,7 @@ import re
 import pycrfsuite
 from ..misc.file_resource import FileResource
 from ..lang.char_classes import CONCAT_ICONS
-
+from ..lang.en_twitter.patterns import IP, URL1, URL2, HASHTAG, CASHTAG, MENTION, EMAIL, EMOJI
 
 class PipeCRF:
     """
@@ -132,86 +132,13 @@ class Tagger(PipeCRF):
     """Part-of-Speech tagger and Sentence Boundary"""
     name = 'tagger'
 
-    URL0 = (
-        # in order to support the prefix tokenization (see prefix test cases in test_urls).
-        r"(?=[\w])"
-        # protocol identifier
-        r"(?:(?:https?|ftp|mailto)://)?"  # specific 
-        # user:pass authentication
-        r"(?:\S+(?::\S*)?@)?"  # specific
-        # IP address exclusion
-        # private & local networks
-        r"(?!(?:10|127)(?:\.\d{1,3}){3})"
-        r"(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})"
-        r"(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})"
-        # IP address dotted notation octets
-        # excludes loopback network 0.0.0.0
-        # excludes reserved space >= 224.0.0.0
-        # excludes network & broadcast addresses
-        # (first & last IP address of each class)
-        # MH: Do we really need this? Seems excessive, and seems to have caused
-        # Issue #957
-        r"(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
-        r"(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}"
-        r"(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
-        # port number
-        r"(?::\d{2,5})?"
-        # resource path
-        r"(?:/\S*)?"
-        # query parameters
-        r"\??(:?\S*)?"
-        # in order to support the suffix tokenization (see suffix test cases in test_urls),
-        r"(?<=[\w/])"
-        # no punctuation
-    ).strip()
-
-    URL1 = (
-        # in order to support the prefix tokenization (see prefix test cases in test_urls).
-        r"(?=[\w])"
-        r"(?:"
-        # protocol identifier
-        r"(?:(?:https?|ftp|mailto)://)"
-        r"|"
-        # user:pass authentication
-        r"(?:\S+(?::\S*)?@)"
-        r")"
-        # host name
-        r"(?:(?:[a-zA-Z0-9]*)?[a-zA-Z0-9]+)"
-        # domain name
-        r"(?:\.(?:[a-zA-Z0-9])*[a-zA-Z0-9]+)*"
-        # TLD identifier
-        r"(?:\.(?:[a-zA-Z]{2,}))"
-        # port number
-        r"(?::\d{2,5})?"
-        # resource path
-        r"(?:/\S*)?"
-        # query parameters
-        r"(:?\?\S*)?"
-        # in order to support the suffix tokenization (see suffix test cases in test_urls),
-        r"(?<=[\w/])"
-    ).strip()
-
-    URL2 = (
-        # in order to support the prefix tokenization (see prefix test cases in test_urls).
-        r"(?=[\w])"
-        # host name
-        r"(?:(?:[a-zA-Z0-9\-]*)?[a-zA-Z0-9]+)"
-        # domain name
-        r"(?:\.(?:[a-zA-Z0-9])*[a-zA-Z0-9]+)*"
-        # TLD identifier
-        r"(?:\.(?:ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bl|bm|bn|bo|bq|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|com|cr|cu|cv|cw|cx|cy|cz|de|dj|dk|dm|do|dz|ec|edu|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gov|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|int|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mf|mg|mh|mil|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|net|nf|ng|ni|nl|no|np|nr|nu|nz|om|org|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|za|zm|zw))"
-        # in order to support the suffix tokenization (see suffix test cases in test_urls),
-        r"(?<=[\w/])"
-        # no punctuation
-    ).strip()
-
     REGEXP_TAGS = (
-        ('URL', '|'.join([URL0, URL1, URL2])),
-        ('HT', r'(?<!\w)[#](\w+|\w+\.\w+)(?!\w)'),
-        ('CT', r"(?:(?<=^)|(?<=\s))\$[a-zA-Z][a-zA-Z0-9]*([\._][a-zA-Z0-9]+)?"),
-        ('USR', r'[@]\w+(?!\w)'),
-        ('EMAIL', r"\b[[:alnum:].%+-]+(?:@| \[at\] )[[:alnum:].-]+(?:\.| \[?dot\]? )[[:alpha:]]{2,}\b"),
-        ('EMJI', r'[{other}]+'.format(other=CONCAT_ICONS)),
+        ('URL', '|'.join([IP, URL1, URL2])),
+        ('HT', HASHTAG),
+        ('CT', CASHTAG),
+        ('USR', MENTION),
+        ('EMAIL', EMAIL),
+        ('EMJI', r'([{other}]+|{emoji})'.format(other=CONCAT_ICONS, emoji=EMOJI)),
     )
 
     SUFFIXES = (
