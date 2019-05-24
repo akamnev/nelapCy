@@ -16,6 +16,7 @@ cdef class Doc:
         self.vocab = vocab
         self.tokens = list()
         self.__ws = ''
+        self.__vector = None
 
     cdef int append(self, str text) except -1:
         """добавление токена"""
@@ -92,14 +93,17 @@ cdef class Doc:
 
     def vector(self):
         """возвращает векторное представление текста"""
+        if self.__vector is not None:
+            return self.__vector
+
         shape = self.vocab[next(iter(self.vocab))].shape
-        v = np.zeros(shape, dtype=float)
+        self.__vector = np.zeros(shape, dtype=float)
         for t in self.tokens:
             try:
-                v += self.vocab[t.text]
+                self.__vector += self.vocab[t.text]
             except KeyError:
                 pass
         l = len(self.tokens)
         if l:
-            v /= l
-        return v
+            self.__vector /= l
+        return self.__vector

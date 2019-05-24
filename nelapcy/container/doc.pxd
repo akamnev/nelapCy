@@ -1,6 +1,7 @@
 cdef class Doc:
     """A sequence of Token objects."""
     cdef object vocab
+    cdef object __vector
     cdef public list tokens
     cdef str __ws
 
