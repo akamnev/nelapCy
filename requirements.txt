@@ -1,5 +1,5 @@
 # Third party dependencies
-# numpy>=1.15.0
+numpy>=1.15.0
 # requests>=2.13.0,<3.0.0
 # jsonschema>=2.6.0,<3.0.0
 # plac<1.0.0,>=0.9.6
