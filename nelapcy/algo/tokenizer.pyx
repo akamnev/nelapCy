@@ -204,8 +204,10 @@ cdef int consists_of(str string, str characters) except -1:
 
 cdef class Tokenizer(TokenizerBottomUp):
     """Токенизатор, который наследуется от класса реализующего алгоритм токенизации и добавляет создание контейнеров"""
+    cdef object vocab
 
-    def __init__(self, Tree tree, pattern_special, pattern_punctuation, whitespace_character=None):
+    def __init__(self, vocab, Tree tree, pattern_special, pattern_punctuation, whitespace_character=None):
+        self.vocab = vocab
         super().__init__(tree, pattern_special, pattern_punctuation, whitespace_character)
 
     def run(self, text):
@@ -214,7 +216,7 @@ cdef class Tokenizer(TokenizerBottomUp):
         Метод возвращает объект типа Doc
         """
         splitted_text = [x.text for x in super().run(text)]
-        doc = Doc(None)
+        doc = Doc(self.vocab)
         for substring in splitted_text:
             if consists_of(substring, self.whitespace_character) == 0:
                 doc.append(substring)  # token

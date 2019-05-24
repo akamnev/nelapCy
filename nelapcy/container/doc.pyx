@@ -1,4 +1,5 @@
 # coding: utf8
+import numpy as np
 from .token import Token
 
 
@@ -88,3 +89,17 @@ cdef class Doc:
             ne = [{'text': [t.text for t in x], 'class': x[0].ne[2:]} for x in ne]
         ne = [{'text': ' '.join(x['text']), 'class': x['class']} for x in ne]
         return ne
+
+    def vector(self):
+        """возвращает векторное представление текста"""
+        shape = self.vocab[next(iter(self.vocab))].shape
+        v = np.zeros(shape, dtype=float)
+        for t in self.tokens:
+            try:
+                v += self.vocab[t.text]
+            except KeyError:
+                pass
+        l = len(self.tokens)
+        if l:
+            v /= l
+        return v

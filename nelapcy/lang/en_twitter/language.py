@@ -19,13 +19,18 @@ DIR = os.path.dirname(__file__)
 class EnglishTwitter:
     lang = 'en'
 
-    def __init__(self):
+    def __init__(self, vocab=None):
+        """
+        :param vocab: - внешние данные о языке, в нашем случае только вектора слов
+        """
+        self.vocab = vocab
         # Токенизатор
         tree = Tree()
         words = self._read_data('tokenizer_dictionary.json')
         words = [x.lower() for x in words]  # переводим все слова из словаря к нижнему регистру
         tree.create_tree(words)
-        self.tokenizer = Tokenizer(tree, TOKEN_MATCH, PUNCT_MATCH, whitespace_character=whitespace_character)
+        self.tokenizer = Tokenizer(self.vocab, tree, TOKEN_MATCH, PUNCT_MATCH,
+                                   whitespace_character=whitespace_character)
         # Лемматизатор
         self.lemmatizer = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, LOOKUP)
         # PoS tagger
