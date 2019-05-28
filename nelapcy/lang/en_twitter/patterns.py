@@ -1,4 +1,6 @@
 # coding: utf8
+# https://www.regular-expressions.info/catastrophic.html
+# нельзя делать (\d+)+ так как это приводит к O(n^2) сложности
 from ..char_classes import CONCAT_BRACKET, CONCAT_CURRENCY, CONCAT_HYPHENS, CONCAT_SYMBOL, CONCAT_PUNCT, CONCAT_QUOTES
 
 IP = (
@@ -42,7 +44,7 @@ URL2 = (
 HASHTAG = r'(?<!\w)#(\w+\.?\w+)(?!\w)'  # ＃#
 CASHTAG = r"(?:(?<=^)|(?<=\s))\$[a-zA-Z]\w*([\._]\w+)?"
 MENTION = r'(?:(?<=^)|(?<=\s)|(?<!\w))@\w+'  # ＠@
-EMAIL = r"(?:(?<=^)|(?<=\s)|(?<!\w))[\w\-\.]+@[\w\-]+(\.\w+)+"
+EMAIL = r"(?:(?<=^)|(?<=\s)|(?<!\w))[\w\-\.]+@[\w\-]+(\.\w+)+"  # здесь не должно быть зависания, так как \. снимает неопределенность (\w+)+
 NUMBERS = (
     r"((?<=^)|(?<=[\s%s%s%s%s])|(?<=\d[%s]))[\+%s]*\d+([\,\-\.\/:']\d+)*"
     r"((million|st|rd|nd|th|gb|s|t|g|b|h|k|m)(?!\w))?"
@@ -51,7 +53,7 @@ NUMBERS = (
 POS = r"(?<=\w)[\'`‘´’](s|m|re|d|ve|ll)(?=\s)" # притяжательная форма
 WORD_WITH_NUMBER = (
     r"((?<=^)|(?<=[\\\/\s%s%s%s]))"
-    r"(\d+[\,'\.]?)+\d+"
+    r"\d+[\,'\.]?\d+"
     r"("
     r"[%s]+"
     r"[a-zA-Z]+"
@@ -144,6 +146,7 @@ ETC_DOTS = r'(?<=etc)\.+'
 VERSION_ = r"(\w+[%s]+)+v(\d+\.)*\d+" % (CONCAT_HYPHENS, )
 
 TOKEN_MATCH = (
+    r"(" +
     '|'.join(
         [
             IP,
@@ -168,20 +171,22 @@ TOKEN_MATCH = (
             ETC_DOTS,
             VERSION_,
         ])
+    + r")"
 )
-
 
 PUNCT = r"([\.,\!\?\:…%s]+)" % (CONCAT_HYPHENS, )
 SYM = r"([%s]+\>+|<->)" % (CONCAT_HYPHENS, )
 AND = r"(?<=\w)[\\\/](?=\w)"
 
 PUNCT_MATCH = (
+    r"(" +
     '|'.join(
         [
             SYM,
             PUNCT,
             AND
         ])
+    + r")"
 )
 
 __all__ = ['TOKEN_MATCH', 'PUNCT_MATCH']
