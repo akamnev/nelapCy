@@ -107,3 +107,14 @@ cdef class Doc:
         if l:
             self.__vector /= l
         return self.__vector
+
+    def sentence(self):
+        """Возвращает последовательность предложений"""
+        snt = [[self.tokens[0]]]
+        for i in range(1, len(self)):
+            token = self.tokens[i]
+            if token.snt[0] == 'I':
+                snt[-1].append(token)
+            else:
+                snt.append([token])
+        return snt
